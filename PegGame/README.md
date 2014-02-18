@@ -6,12 +6,15 @@ Tu tarea es, dado un tablero de juego, determinar el lugar óptimo para soltar l
 
 La siguiente figura muestra un ejemplo de un tablero con 5 filas y 5 columnas ('x' indica una pija, '.' indica espacio vacío):
 
+```
   x.x.x.x.x 
    x...x.x 
   x...x.x.x 
    x.x...x 
   x.x.x.x.x
-   G   
+   G
+```
+   
 Nota que la fila superior tiene 5 pijas, la siguiente tiene 4, la siguiente 5, etc. Con 5 columnas, existen 4 opciones dónde dejar caer la pelota (indexando desde 0). Nota también que en este ejemplo, faltan 3 pijas. Por convención, diremos que la fila de la parte superior es la fila 0, y la pija que se encuentra más a la izquierda se encuentra en la columna 0, de tal manera que las pijas faltantes se encuentran en (1,1), (2,1) y (3,2). En este ejemplo, el mejor lugar para soltar la pelota es en la columna 1 (la que está más a la izquierda), la cual te da un 50% de probabilidad de que caiga en el objetivo.
 
 Entradas:
