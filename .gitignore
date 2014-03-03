@@ -1,0 +1,10 @@
+.gitignore
+*.iml
+**/*.iml
+**/.idea
+**/.gradle
+**/target
+**/classes
+**/*.classes
+**/.lein-failures
+**/*~
