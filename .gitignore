@@ -8,3 +8,9 @@
 **/*.classes
 **/.lein-failures
 **/*~
+**/build
+**/gradlew
+**/gradlew.bat
+**/gradle
+**/.gradletasknamecache
+**/out
