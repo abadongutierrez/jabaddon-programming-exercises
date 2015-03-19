@@ -1,16 +1,19 @@
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Main {
-    private int testCasesTotal;
+    public static final int MIN_VALUE = 1;
+    public static final long MAX_VALUE = 10000000000L;
+    private int numberOfTestCases;
 
     private List<TestCase> testCases = new ArrayList<TestCase>();
 
     public void processInput(Scanner scanner) {
-        testCasesTotal = Integer.valueOf(scanner.nextLine());
-        for (int i = 0; i < testCasesTotal; ++i) {
+        numberOfTestCases = Integer.valueOf(scanner.nextLine());
+        for (int i = 0; i < numberOfTestCases; ++i) {
             testCases.add(processTestCase(scanner));
         }
     }
@@ -31,8 +34,8 @@ public class Main {
         return new TestCase(k, hints);
     }
 
-    public int getTestCasesTotal() {
-        return testCasesTotal;
+    public int getNumberOfTestCases() {
+        return numberOfTestCases;
     }
 
     public TestCase getTestCase(int index) {
@@ -41,15 +44,31 @@ public class Main {
 
     public long minimalPossibleNumberOfLiesForTestCase(int index) {
         TestCase testCase = getTestCase(index);
-        int minLies = testCase.getHintsTotal();
-        for (long n = 1; n <= testCase.getMaxNToSearch(); ++n) {
-            int lies = testCase.liesUsingNumber(n);
-            if (lies <= minLies) {
-                minLies = lies;
+        int k = testCase.getHintsTotal();
+        Set<Long> values = testCase.getValuesToCheck();
+        for (Long value : values) {
+            int lies = testCase.liesForNumber(value);
+            if (lies <= k) {
+                k = lies;
             }
         }
-        return minLies;
+        return k;
     }
+
+//    public long minimalPossibleNumberOfLiesForTestCase_v2(int index) {
+//        TestCase testCase = getTestCase(index);
+//        int k = testCase.getHintsTotal();
+//        List<Hint> hints = testCase.getHints();
+//        for (Hint hint : hints) {
+//            if (Hint.Operator.LESS_THAN == hint.getOperator()) {
+//                if (hint.isYes()) {
+//                    range[MIN_VALUE : hint.getValue() - 1] += 1;
+//                } else {
+//                    range[hint.getValue()]
+//                }
+//            }
+//        }
+//    }
 
     public static class TestCase {
         private final int hintsTotal;
@@ -69,60 +88,36 @@ public class Main {
             return hints;
         }
 
-        public int liesUsingNumber(long number) {
-            int liesTotal = 0;
+        public Set<Long> getValuesToCheck() {
+            Set<Long> values = new HashSet<Long>();
             for (Hint hint : this.hints) {
-                if (!hint.isTrue(number)) {
-                    liesTotal++;
-                }
+                values.addAll(hint.getValuesToCheck());
             }
-            return liesTotal;
+            return values;
         }
 
-        public long getMaxNToSearch() {
-            List<Long> hintsGtYes = new ArrayList<Long>();
+        public int liesForNumber(long number) {
+            int liesCount = 0;
             for (Hint hint : this.hints) {
-                if (hint.operator == Hint.Operator.GREATER_THAN && hint.isYes()) {
-                    hintsGtYes.add(hint.getValue());
+                if (!hint.isCorrectFor(number)) {
+                    liesCount++;
                 }
             }
-
-            if (hintsGtYes.size() > 0) {
-                Collections.sort(hintsGtYes);
-                return hintsGtYes.get(hintsGtYes.size() - 1) + 1;
-            }
-
-            List<Long> hintsGtNo = new ArrayList<Long>();
-            for (Hint hint : this.hints) {
-                if (hint.operator == Hint.Operator.GREATER_THAN && hint.isNo()) {
-                    hintsGtNo.add(hint.getValue());
-                }
-            }
-
-            if (hintsGtNo.size() > 0) {
-                Collections.sort(hintsGtNo);
-                return hintsGtNo.get(hintsGtNo.size() - 1);
-            }
-
-            List<Long> hintsEq = new ArrayList<Long>();
-            for (Hint hint : this.hints) {
-                if (hint.operator == Hint.Operator.EQUALS && hint.isYes()) {
-                    hintsEq.add(hint.getValue());
-                }
-            }
-
-            if (hintsEq.size() > 0) {
-                Collections.sort(hintsEq);
-                return hintsEq.get(hintsEq.size() - 1);
-            }
-
-            return 10000000000L;
+            return liesCount;
         }
     }
 
     public static class Hint {
 
-        public boolean isTrue(long number) {
+        public Set<Long> getValuesToCheck() {
+            Set<Long> values = new HashSet<Long>();
+            values.add(this.getValue() == MIN_VALUE ? MIN_VALUE : this.getValue() - 1);
+            values.add(this.getValue());
+            values.add(this.getValue() + 1);
+            return values;
+        }
+
+        public boolean isCorrectFor(long number) {
             if (this.operator == Operator.GREATER_THAN) {
                 return (number > this.value) == this.logicalValue;
             }
@@ -132,10 +127,6 @@ public class Main {
             else {
                 return (number == this.value) == this.logicalValue;
             }
-        }
-
-        public boolean isLie(long number) {
-            return !isTrue(number);
         }
 
         public static enum Operator {
@@ -190,7 +181,7 @@ public class Main {
     public static void main(String [] args) {
         Main gg = new Main();
         gg.processInput(new Scanner(System.in));
-        for (int i = 0; i < gg.getTestCasesTotal(); ++i) {
+        for (int i = 0; i < gg.getNumberOfTestCases(); ++i) {
             System.out.println(gg.minimalPossibleNumberOfLiesForTestCase(i));
         }
     }
